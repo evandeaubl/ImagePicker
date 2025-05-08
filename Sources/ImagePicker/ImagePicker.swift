@@ -113,6 +113,12 @@ public struct ImagePicker: View {
             .frame(width: size.width, height: size.height)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
             .contentShape(Rectangle())
+            .onReceive(NotificationCenter.default.publisher(for: UIPasteboard.changedNotification)) { _ in
+                checkClipboardForImage()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                checkClipboardForImage()
+            }
             
             // X button to clear the image (only shown when an image is present)
             if image != nil && isEnabled {
