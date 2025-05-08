@@ -20,9 +20,6 @@ public struct ImagePicker: View {
     /// Corner radius of the image picker view
     private var cornerRadius: CGFloat
     
-    /// State to control the action sheet presentation
-    @State private var showingOptions = false
-    
     /// State to control the photo picker presentation
     @State private var showingPhotoPicker = false
     
@@ -62,31 +59,61 @@ public struct ImagePicker: View {
     public var body: some View {
         ZStack(alignment: .topTrailing) {
             // Main content - either the image or the placeholder
-            Group {
-                if let image = image {
-                    // Display the selected image
-                    image
-                        .resizable()
-                        .scaledToFill()
-                } else {
-                    // Display the placeholder
-                    ZStack {
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .fill(Color(.systemGray5))
-                        
-                        Image(systemName: isEnabled ? "plus" : "photo")
-                            .font(.system(size: 40))
-                            .foregroundColor(.gray)
+            Menu {
+                Button {
+                    showingPhotoPicker = true
+                } label: {
+                    Label("Photo Library", systemImage: "photo.stack")
+                }
+                
+                if isCameraAvailable {
+                    Button {
+                        showingCamera = true
+                    } label: {
+                        Label("Camera", systemImage: "camera")
+                    }
+                }
+                
+                if clipboardHasImage {
+                    Button {
+                        if let uiImage = UIPasteboard.general.image {
+                            image = Image(uiImage: uiImage)
+                        }
+                    } label: {
+                        Label("Paste from Clipboard", systemImage: "doc.on.clipboard")
+                    }
+                }
+                
+                if image != nil {
+                    Button(role: .destructive) {
+                        image = nil
+                    } label: {
+                        Label("Remove Image", systemImage: "trash")
+                    }
+                }
+            } label: {
+                Group {
+                    if let image = image {
+                        // Display the selected image
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    } else {
+                        // Display the placeholder
+                        ZStack {
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .fill(Color(.systemGray5))
+                            
+                            Image(systemName: isEnabled ? "plus" : "photo")
+                                .font(.system(size: 40))
+                                .foregroundColor(.gray)
+                        }
                     }
                 }
             }
             .frame(width: size.width, height: size.height)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
             .contentShape(Rectangle())
-            .onTapGesture {
-                checkClipboardForImage()
-                showingOptions = true
-            }
             
             // X button to clear the image (only shown when an image is present)
             if image != nil && isEnabled {
@@ -100,33 +127,6 @@ public struct ImagePicker: View {
                 }
                 .padding(8)
             }
-        }
-        .confirmationDialog("Select Image", isPresented: $showingOptions) {
-            Button("Photo Library") {
-                showingPhotoPicker = true
-            }
-            
-            if isCameraAvailable {
-                Button("Camera") {
-                    showingCamera = true
-                }
-            }
-            
-            if clipboardHasImage {
-                Button("Paste from Clipboard") {
-                    if let uiImage = UIPasteboard.general.image {
-                        image = Image(uiImage: uiImage)
-                    }
-                }
-            }
-            
-            if image != nil {
-                Button("Remove Image", role: .destructive) {
-                    image = nil
-                }
-            }
-            
-            Button("Cancel", role: .cancel) {}
         }
         .photosPicker(isPresented: $showingPhotoPicker, selection: $selectedItem, matching: .images)
         .onChange(of: selectedItem) { newItem in
