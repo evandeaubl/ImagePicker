@@ -9,6 +9,8 @@ import UniformTypeIdentifiers
 /// A SwiftUI view that displays an optional image with the ability to select from photo library,
 /// capture from camera, or clear the image.
 public struct ImagePicker: View {
+    @Environment(\.isEnabled) private var isEnabled: Bool
+    
     /// Binding to the optional image
     @Binding private var image: Image?
     
@@ -72,7 +74,7 @@ public struct ImagePicker: View {
                         RoundedRectangle(cornerRadius: cornerRadius)
                             .fill(Color(.systemGray5))
                         
-                        Image(systemName: "plus")
+                        Image(systemName: isEnabled ? "plus" : "photo")
                             .font(.system(size: 40))
                             .foregroundColor(.gray)
                     }
@@ -87,7 +89,7 @@ public struct ImagePicker: View {
             }
             
             // X button to clear the image (only shown when an image is present)
-            if image != nil {
+            if image != nil && isEnabled {
                 Button(action: {
                     image = nil
                 }) {
