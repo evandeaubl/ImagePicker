@@ -26,6 +26,9 @@ public struct ImagePicker: View {
     /// State to control the camera presentation
     @State private var showingCamera = false
     
+    /// State to control the document picker presentation
+    @State private var showingDocumentPicker = false
+    
     /// PhotosPickerItem from the photo library selection
     @State private var selectedItem: PhotosPickerItem?
     
@@ -71,6 +74,12 @@ public struct ImagePicker: View {
                     } label: {
                         Label("Camera", systemImage: "camera")
                     }
+                }
+                
+                Button {
+                    showingDocumentPicker = true
+                } label: {
+                    Label("Files", systemImage: "folder")
                 }
                 
                 if clipboardHasImage {
@@ -149,6 +158,9 @@ public struct ImagePicker: View {
             CameraView(image: $image)
                 .ignoresSafeArea()
         }
+        .sheet(isPresented: $showingDocumentPicker) {
+            DocumentPickerView(image: $image)
+        }
         .onAppear {
             checkClipboardForImage()
         }
@@ -189,6 +201,57 @@ struct CameraView: UIViewControllerRepresentable {
         }
         
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.presentationMode.wrappedValue.dismiss()
+        }
+    }
+}
+
+/// A UIViewControllerRepresentable wrapper for UIDocumentPickerViewController to select images from files
+struct DocumentPickerView: UIViewControllerRepresentable {
+    @Binding var image: Image?
+    @Environment(\.presentationMode) var presentationMode
+    
+    func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
+        // Define the supported content types (only JPEG, PNG, and HEIC)
+        let supportedTypes: [UTType] = [.jpeg, .png, .heic]
+        
+        // Create a document picker with the supported types
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: supportedTypes)
+        picker.delegate = context.coordinator
+        picker.allowsMultipleSelection = false
+        
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: UIDocumentPickerViewController, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, UIDocumentPickerDelegate {
+        let parent: DocumentPickerView
+        
+        init(_ parent: DocumentPickerView) {
+            self.parent = parent
+        }
+        
+        func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+            guard let url = urls.first else { return }
+            
+            // Attempt to create a UIImage from the selected file
+            guard let uiImage = UIImage(contentsOfFile: url.path) else {
+                print("Failed to create image from file: \(url.path)")
+                parent.presentationMode.wrappedValue.dismiss()
+                return
+            }
+            
+            // Update the image binding
+            parent.image = Image(uiImage: uiImage)
+            parent.presentationMode.wrappedValue.dismiss()
+        }
+        
+        func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
             parent.presentationMode.wrappedValue.dismiss()
         }
     }
