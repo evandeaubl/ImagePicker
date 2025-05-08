@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		20BDA3282DCB92D000B36CE5 /* ImagePicker in Frameworks */ = {isa = PBXBuildFile; productRef = 20BDA3272DCB92D000B36CE5 /* ImagePicker */; };
+		20BDA32D2DCD02D900B36CE5 /* ImagePicker in Frameworks */ = {isa = PBXBuildFile; productRef = 20BDA32C2DCD02D900B36CE5 /* ImagePicker */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				20BDA3282DCB92D000B36CE5 /* ImagePicker in Frameworks */,
+				20BDA32D2DCD02D900B36CE5 /* ImagePicker in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,7 +70,7 @@
 			);
 			name = ImagePickerDemo;
 			packageProductDependencies = (
-				20BDA3272DCB92D000B36CE5 /* ImagePicker */,
+				20BDA32C2DCD02D900B36CE5 /* ImagePicker */,
 			);
 			productName = ImagePickerDemo;
 			productReference = 20BDA3182DCB927800B36CE5 /* ImagePickerDemo.app */;
@@ -101,7 +101,7 @@
 			mainGroup = 20BDA30F2DCB927800B36CE5;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				20BDA3262DCB92D000B36CE5 /* XCLocalSwiftPackageReference "../../../ImagePicker" */,
+				20BDA32B2DCD02D900B36CE5 /* XCLocalSwiftPackageReference "../../../ImagePicker" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 20BDA3192DCB927800B36CE5 /* Products */;
@@ -331,14 +331,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		20BDA3262DCB92D000B36CE5 /* XCLocalSwiftPackageReference "../../../ImagePicker" */ = {
+		20BDA32B2DCD02D900B36CE5 /* XCLocalSwiftPackageReference "../../../ImagePicker" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../../ImagePicker;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		20BDA3272DCB92D000B36CE5 /* ImagePicker */ = {
+		20BDA32C2DCD02D900B36CE5 /* ImagePicker */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ImagePicker;
 		};
