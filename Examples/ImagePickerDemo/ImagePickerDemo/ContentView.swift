@@ -18,9 +18,10 @@ struct ContentView: View {
                 .fontWeight(.bold)
             
             // ImagePicker component
-            ImagePicker(image: $selectedImage, 
-                        size: CGSize(width: 200, height: 200),
-                        cornerRadius: 12)
+            ImagePicker(image: $selectedImage)
+                .frame(width: 200, height: 200)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .contentShape(Rectangle())
                 .shadow(radius: 5)
             
             // Display selected image information

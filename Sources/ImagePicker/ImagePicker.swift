@@ -14,12 +14,6 @@ public struct ImagePicker: View {
     /// Binding to the optional image
     @Binding private var image: Image?
     
-    /// Size of the image picker view
-    private var size: CGSize
-    
-    /// Corner radius of the image picker view
-    private var cornerRadius: CGFloat
-    
     /// State to control the photo picker presentation
     @State private var showingPhotoPicker = false
     
@@ -44,13 +38,9 @@ public struct ImagePicker: View {
     ///   - size: Size of the image picker view (default: 150x150)
     ///   - cornerRadius: Corner radius of the image picker view (default: 8)
     public init(
-        image: Binding<Image?>,
-        size: CGSize = CGSize(width: 150, height: 150),
-        cornerRadius: CGFloat = 8
+        image: Binding<Image?>
     ) {
         self._image = image
-        self.size = size
-        self.cornerRadius = cornerRadius
     }
     
     /// Checks if the clipboard contains a compatible image
@@ -109,7 +99,7 @@ public struct ImagePicker: View {
                     } else {
                         // Display the placeholder
                         ZStack {
-                            RoundedRectangle(cornerRadius: cornerRadius)
+                            Rectangle()
                                 .fill(Color(.systemGray5))
                             
                             Image(systemName: isEnabled ? "plus" : "photo")
@@ -119,9 +109,6 @@ public struct ImagePicker: View {
                     }
                 }
             }
-            .frame(width: size.width, height: size.height)
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-            .contentShape(Rectangle())
             .onReceive(NotificationCenter.default.publisher(for: UIPasteboard.changedNotification)) { _ in
                 checkClipboardForImage()
             }
