@@ -157,7 +157,7 @@ public struct ImagePicker: View {
 /// A UIViewControllerRepresentable wrapper for UIImagePickerController to capture images from the camera
 struct CameraView: UIViewControllerRepresentable {
     @Binding var image: Image?
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
     
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
@@ -184,11 +184,11 @@ struct CameraView: UIViewControllerRepresentable {
                 parent.image = Image(uiImage: uiImage)
             }
             
-            parent.presentationMode.wrappedValue.dismiss()
+            parent.dismiss()
         }
         
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            parent.presentationMode.wrappedValue.dismiss()
+            parent.dismiss()
         }
     }
 }
@@ -196,7 +196,7 @@ struct CameraView: UIViewControllerRepresentable {
 /// A UIViewControllerRepresentable wrapper for UIDocumentPickerViewController to select images from files
 struct DocumentPickerView: UIViewControllerRepresentable {
     @Binding var image: Image?
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
     
     func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
         // Define the supported content types (only JPEG, PNG, and HEIC)
@@ -229,17 +229,17 @@ struct DocumentPickerView: UIViewControllerRepresentable {
             // Attempt to create a UIImage from the selected file
             guard let uiImage = UIImage(contentsOfFile: url.path) else {
                 print("Failed to create image from file: \(url.path)")
-                parent.presentationMode.wrappedValue.dismiss()
+                parent.dismiss()
                 return
             }
             
             // Update the image binding
             parent.image = Image(uiImage: uiImage)
-            parent.presentationMode.wrappedValue.dismiss()
+            parent.dismiss()
         }
         
         func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-            parent.presentationMode.wrappedValue.dismiss()
+            parent.dismiss()
         }
     }
 }
