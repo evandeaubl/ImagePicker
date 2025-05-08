@@ -4,6 +4,7 @@
 import SwiftUI
 import PhotosUI
 import UIKit
+import UniformTypeIdentifiers
 
 /// A SwiftUI view that displays an optional image with the ability to select from photo library,
 /// capture from camera, or clear the image.
@@ -29,6 +30,9 @@ public struct ImagePicker: View {
     /// PhotosPickerItem from the photo library selection
     @State private var selectedItem: PhotosPickerItem?
     
+    /// State to track if clipboard contains a compatible image
+    @State private var clipboardHasImage = false
+    
     /// Flag indicating if camera is available on the device
     private let isCameraAvailable = UIImagePickerController.isSourceTypeAvailable(.camera)
     
@@ -45,6 +49,12 @@ public struct ImagePicker: View {
         self._image = image
         self.size = size
         self.cornerRadius = cornerRadius
+    }
+    
+    /// Checks if the clipboard contains a compatible image
+    private func checkClipboardForImage() {
+        let pasteboard = UIPasteboard.general
+        clipboardHasImage = pasteboard.image != nil
     }
     
     public var body: some View {
@@ -72,6 +82,7 @@ public struct ImagePicker: View {
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
             .contentShape(Rectangle())
             .onTapGesture {
+                checkClipboardForImage()
                 showingOptions = true
             }
             
@@ -99,6 +110,14 @@ public struct ImagePicker: View {
                 }
             }
             
+            if clipboardHasImage {
+                Button("Paste from Clipboard") {
+                    if let uiImage = UIPasteboard.general.image {
+                        image = Image(uiImage: uiImage)
+                    }
+                }
+            }
+            
             if image != nil {
                 Button("Remove Image", role: .destructive) {
                     image = nil
@@ -122,6 +141,9 @@ public struct ImagePicker: View {
         .fullScreenCover(isPresented: $showingCamera) {
             CameraView(image: $image)
                 .ignoresSafeArea()
+        }
+        .onAppear {
+            checkClipboardForImage()
         }
     }
 }

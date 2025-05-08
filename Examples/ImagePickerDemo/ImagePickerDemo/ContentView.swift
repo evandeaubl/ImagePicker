@@ -49,6 +49,7 @@ struct ContentView: View {
                     .font(.headline)
                 Text("• Tap the image picker to select a photo")
                 Text("• Choose from photo library" + (UIImagePickerController.isSourceTypeAvailable(.camera) ? " or camera" : ""))
+                Text("• Paste from clipboard if an image is available")
                 Text("• Tap the X button to clear the image")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
