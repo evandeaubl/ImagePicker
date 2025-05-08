@@ -49,107 +49,111 @@ public struct ImagePicker: View {
     }
     
     public var body: some View {
-        ZStack(alignment: .topTrailing) {
-            // Main content - either the image or the placeholder
-            Menu {
-                Button {
-                    showingPhotoPicker = true
-                } label: {
-                    Label("Photo Library", systemImage: "photo.stack")
-                }
-                
-                if isCameraAvailable {
+        GeometryReader { geom in
+            ZStack(alignment: .topTrailing) {
+                // Main content - either the image or the placeholder
+                Menu {
                     Button {
-                        showingCamera = true
+                        showingPhotoPicker = true
                     } label: {
-                        Label("Camera", systemImage: "camera")
+                        Label("Photo Library", systemImage: "photo.stack")
                     }
-                }
-                
-                Button {
-                    showingDocumentPicker = true
-                } label: {
-                    Label("Files", systemImage: "folder")
-                }
-                
-                if clipboardHasImage {
-                    Button {
-                        if let uiImage = UIPasteboard.general.image {
-                            image = Image(uiImage: uiImage)
+                    
+                    if isCameraAvailable {
+                        Button {
+                            showingCamera = true
+                        } label: {
+                            Label("Camera", systemImage: "camera")
                         }
+                    }
+                    
+                    Button {
+                        showingDocumentPicker = true
                     } label: {
-                        Label("Paste from Clipboard", systemImage: "doc.on.clipboard")
+                        Label("Files", systemImage: "folder")
+                    }
+                    
+                    if clipboardHasImage {
+                        Button {
+                            if let uiImage = UIPasteboard.general.image {
+                                image = Image(uiImage: uiImage)
+                            }
+                        } label: {
+                            Label("Paste from Clipboard", systemImage: "doc.on.clipboard")
+                        }
+                    }
+                    
+                    if image != nil {
+                        Button(role: .destructive) {
+                            image = nil
+                        } label: {
+                            Label("Remove Image", systemImage: "trash")
+                        }
+                    }
+                } label: {
+                    Group {
+                        if let image = image {
+                            // Display the selected image
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        } else {
+                            // Display the placeholder
+                            ZStack {
+                                Rectangle()
+                                    .fill(Color(.systemGray5))
+                                
+                                Image(systemName: isEnabled ? "plus" : "photo")
+                                    .font(.system(size: 40))
+                                    .foregroundColor(.gray)
+                            }
+                        }
                     }
                 }
+                .frame(width: geom.size.width, height: geom.size.height)
+                .clipShape(Rectangle())
+                .onReceive(NotificationCenter.default.publisher(for: UIPasteboard.changedNotification)) { _ in
+                    checkClipboardForImage()
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                    checkClipboardForImage()
+                }
                 
-                if image != nil {
-                    Button(role: .destructive) {
+                // X button to clear the image (only shown when an image is present)
+                if image != nil && isEnabled {
+                    Button(action: {
                         image = nil
-                    } label: {
-                        Label("Remove Image", systemImage: "trash")
+                    }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 22))
+                            .foregroundColor(.white)
+                            .background(Circle().fill(Color.black.opacity(0.5)))
                     }
+                    .padding(8)
                 }
-            } label: {
-                Group {
-                    if let image = image {
-                        // Display the selected image
-                        image
-                            .resizable()
-                            .scaledToFill()
-                    } else {
-                        // Display the placeholder
-                        ZStack {
-                            Rectangle()
-                                .fill(Color(.systemGray5))
-                            
-                            Image(systemName: isEnabled ? "plus" : "photo")
-                                .font(.system(size: 40))
-                                .foregroundColor(.gray)
+            }
+            .photosPicker(isPresented: $showingPhotoPicker, selection: $selectedItem, matching: .images)
+            .onChange(of: selectedItem) { newItem in
+                Task {
+                    if let data = try? await newItem?.loadTransferable(type: Data.self),
+                       let uiImage = UIImage(data: data) {
+                        await MainActor.run {
+                            image = Image(uiImage: uiImage)
+                            selectedItem = nil
                         }
                     }
                 }
             }
-            .onReceive(NotificationCenter.default.publisher(for: UIPasteboard.changedNotification)) { _ in
+            .fullScreenCover(isPresented: $showingCamera) {
+                CameraView(image: $image)
+                    .ignoresSafeArea()
+            }
+            .sheet(isPresented: $showingDocumentPicker) {
+                DocumentPickerView(image: $image)
+            }
+            .onAppear {
                 checkClipboardForImage()
             }
-            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-                checkClipboardForImage()
-            }
-            
-            // X button to clear the image (only shown when an image is present)
-            if image != nil && isEnabled {
-                Button(action: {
-                    image = nil
-                }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 22))
-                        .foregroundColor(.white)
-                        .background(Circle().fill(Color.black.opacity(0.5)))
-                }
-                .padding(8)
-            }
-        }
-        .photosPicker(isPresented: $showingPhotoPicker, selection: $selectedItem, matching: .images)
-        .onChange(of: selectedItem) { newItem in
-            Task {
-                if let data = try? await newItem?.loadTransferable(type: Data.self),
-                   let uiImage = UIImage(data: data) {
-                    await MainActor.run {
-                        image = Image(uiImage: uiImage)
-                        selectedItem = nil
-                    }
-                }
-            }
-        }
-        .fullScreenCover(isPresented: $showingCamera) {
-            CameraView(image: $image)
-                .ignoresSafeArea()
-        }
-        .sheet(isPresented: $showingDocumentPicker) {
-            DocumentPickerView(image: $image)
-        }
-        .onAppear {
-            checkClipboardForImage()
         }
     }
 }
