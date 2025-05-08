@@ -52,8 +52,7 @@ public struct ImagePicker: View {
     
     /// Checks if the clipboard contains a compatible image
     private func checkClipboardForImage() {
-        let pasteboard = UIPasteboard.general
-        clipboardHasImage = pasteboard.image != nil
+        clipboardHasImage = UIPasteboard.general.hasImages
     }
     
     public var body: some View {
