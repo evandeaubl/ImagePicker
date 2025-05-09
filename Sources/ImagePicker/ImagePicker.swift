@@ -48,7 +48,7 @@ public struct ImagePicker: View {
         clipboardHasImage = UIPasteboard.general.hasImages
     }
     
-    var body: some View {
+    public var body: some View {
         GeometryReader { geom in
             ZStack(alignment: .topTrailing) {
                 // Main content - either the image or the placeholder
