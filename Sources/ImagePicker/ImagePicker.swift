@@ -1,6 +1,3 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
-
 import SwiftUI
 import PhotosUI
 import UIKit
@@ -35,8 +32,6 @@ public struct ImagePicker: View {
     /// Initializes a new ImagePicker view
     /// - Parameters:
     ///   - image: Binding to the optional image
-    ///   - size: Size of the image picker view (default: 150x150)
-    ///   - cornerRadius: Corner radius of the image picker view (default: 8)
     public init(
         image: Binding<Image?>
     ) {
@@ -48,7 +43,7 @@ public struct ImagePicker: View {
         clipboardHasImage = UIPasteboard.general.hasImages
     }
     
-    public var body: some View {
+    var body: some View {
         GeometryReader { geom in
             ZStack(alignment: .topTrailing) {
                 // Main content - either the image or the placeholder
