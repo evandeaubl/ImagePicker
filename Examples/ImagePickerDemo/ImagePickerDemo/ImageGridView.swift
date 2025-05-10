@@ -52,7 +52,6 @@ struct ImageGridView: View {
                 }
             }
         }
-        .navigationTitle("Image Grid")
     }
     
     // Image cell with delete button

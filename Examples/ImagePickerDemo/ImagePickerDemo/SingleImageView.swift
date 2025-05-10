@@ -57,7 +57,6 @@ struct SingleImageView: View {
             .cornerRadius(12)
         }
         .padding()
-        .navigationTitle("Single Image")
     }
 }
 
