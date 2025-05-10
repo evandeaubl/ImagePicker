@@ -17,9 +17,6 @@ public struct ImagePickerMenu<Label_>: View where Label_ : View {
     /// State to control the photo picker presentation
     @State private var showingPhotoPicker = false
     
-    /// State to control the camera presentation
-    @State private var showingCamera = false
-    
     /// State to control the document picker presentation
     @State private var showingDocumentPicker = false
     
@@ -29,8 +26,13 @@ public struct ImagePickerMenu<Label_>: View where Label_ : View {
     /// State to track if clipboard contains a compatible image
     @State private var clipboardHasImage = false
     
+    #if !os(visionOS)
+    /// State to control the camera presentation
+    @State private var showingCamera = false
+    
     /// Flag indicating if camera is available on the device
     private let isCameraAvailable = UIImagePickerController.isSourceTypeAvailable(.camera)
+    #endif
     
     private var label: () -> Label_
     
@@ -56,6 +58,7 @@ public struct ImagePickerMenu<Label_>: View where Label_ : View {
                 Label("Photo Library", systemImage: "photo.stack")
             }
             
+            #if !os(visionOS)
             if isCameraAvailable {
                 Button {
                     showingCamera = true
@@ -63,6 +66,7 @@ public struct ImagePickerMenu<Label_>: View where Label_ : View {
                     Label("Camera", systemImage: "camera")
                 }
             }
+            #endif
             
             Button {
                 showingDocumentPicker = true
@@ -98,10 +102,12 @@ public struct ImagePickerMenu<Label_>: View where Label_ : View {
                 }
             }
         }
+        #if !os(visionOS)
         .fullScreenCover(isPresented: $showingCamera) {
             CameraView(image: $image)
                 .ignoresSafeArea()
         }
+        #endif
         .sheet(isPresented: $showingDocumentPicker) {
             DocumentPickerView(image: $image)
         }
@@ -111,6 +117,7 @@ public struct ImagePickerMenu<Label_>: View where Label_ : View {
     }
 }
 
+#if !os(visionOS)
 /// A UIViewControllerRepresentable wrapper for UIImagePickerController to capture images from the camera
 struct CameraView: UIViewControllerRepresentable {
     @Binding var image: Image?
@@ -149,6 +156,7 @@ struct CameraView: UIViewControllerRepresentable {
         }
     }
 }
+#endif
 
 /// A UIViewControllerRepresentable wrapper for UIDocumentPickerViewController to select images from files
 struct DocumentPickerView: UIViewControllerRepresentable {
