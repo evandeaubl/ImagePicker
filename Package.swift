@@ -21,5 +21,6 @@ let package = Package(
         .target(
             name: "ImagePicker"),
 
-    ]
+    ],
+    swiftLanguageModes: [.v5, .v6]
 )
