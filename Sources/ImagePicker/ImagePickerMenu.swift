@@ -191,6 +191,13 @@ struct DocumentPickerView: UIViewControllerRepresentable {
         func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
             guard let url = urls.first else { return }
             
+            guard url.startAccessingSecurityScopedResource() else {
+                // TODO Handle the failure here.
+                return
+            }
+            
+            defer { url.stopAccessingSecurityScopedResource() }
+            
             // Attempt to create a UIImage from the selected file
             guard let uiImage = UIImage(contentsOfFile: url.path) else {
                 print("Failed to create image from file: \(url.path)")
