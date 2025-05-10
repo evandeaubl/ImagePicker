@@ -48,6 +48,7 @@ public struct ImagePicker: View {
                             }
                         }
                     }
+                    .frame(width: geom.size.width, height: geom.size.height)
                 }
                 
                 // X button to clear the image (only shown when an image is present)
